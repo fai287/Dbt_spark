@@ -1,0 +1,9 @@
+
+target/
+dbt_packages/
+logs/
+jars/
+derby.log
+metastore_db/
+spark-warehouse/
+powerbi_export/

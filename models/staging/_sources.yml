@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw tables ingested from PostgreSQL into Spark via JDBC."
+    schema: default
+    tables:
+      - name: customers
+        description: "Customer source table, loaded from PostgreSQL pipeline_db.customers."
+      - name: orders
+        description: "Order transactions, loaded from PostgreSQL pipeline_db.orders."
