@@ -15,6 +15,15 @@ Lake**, builds a star schema, and publishes the results to an analytics
 
 ## 1. System Architecture
 
+![System architecture](dashboard/img/architecture.png)
+
+The whole flow runs as a single orchestrated script (`run_pipeline.sh`). Because
+local Spark uses an embedded **Derby** metastore that only **one JVM** may open
+at a time, every stage runs in a process that exits before the next begins.
+
+<details>
+<summary>Mermaid source (editable diagram)</summary>
+
 ```mermaid
 flowchart LR
     subgraph SRC["PostgreSQL  (source: pipeline_db)"]
@@ -66,9 +75,7 @@ flowchart LR
     class GOLD,CSV,PG,DASH gold
 ```
 
-The whole flow runs as a single orchestrated script (`run_pipeline.sh`). Because
-local Spark uses an embedded **Derby** metastore that only **one JVM** may open
-at a time, every stage runs in a process that exits before the next begins.
+</details>
 
 ---
 
