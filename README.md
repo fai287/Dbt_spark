@@ -188,7 +188,27 @@ erDiagram
 
 ---
 
-## 5. How to run
+## 5. Data quality tests
+
+dbt tests guard the keys that make the SCD2 model and star schema correct
+(`snapshots/_snapshots.yml`, `models/marts/_marts.yml`). Run with `dbt test`
+— **16 tests, all passing**:
+
+| object                  | column         | tests                                  |
+|-------------------------|----------------|----------------------------------------|
+| `customers_snapshot`    | `dbt_scd_id`   | `unique`, `not_null` (one row per version) |
+| `customers_snapshot`    | `customer_id`  | `not_null`                             |
+| `customers_snapshot`    | `dbt_valid_from`, `dbt_updated_at` | `not_null`         |
+| `dim_customers`         | `customer_key` | `unique`, `not_null`                   |
+| `dim_customers_current` | `customer_id`  | `unique`, `not_null` (current grain)   |
+| `fact_orders`           | `order_id`     | `unique`, `not_null`                   |
+| `fact_orders`           | `customer_id`  | `not_null`, `relationships` → `dim_customers_current` |
+
+The `unique` test on `dbt_scd_id` proves the snapshot produces exactly one row
+per customer version; `unique` on `dim_customers_current.customer_id` proves the
+current view collapses SCD2 history to one live row per customer.
+
+## 6. How to run
 
 **Prerequisites:** PostgreSQL running with database `pipeline_db`, user
 `pipeline_user` (see note on credentials below), and a Python virtualenv at
@@ -222,7 +242,7 @@ holding the lock — **never leave a `pyspark` shell open while running dbt**.
 
 ---
 
-## 6. Connecting Power BI
+## 7. Connecting Power BI
 
 The pipeline produces two Power-BI-ready sources:
 
@@ -237,7 +257,7 @@ for as-was / historical analysis via `valid_from` / `valid_to` / `is_current`.
 
 ---
 
-## 7. Repository layout
+## 8. Repository layout
 
 ```
 my_dbt_project/
@@ -257,7 +277,7 @@ my_dbt_project/
 └── powerbi_export/                 # generated CSVs (git-ignored)
 ```
 
-## 8. Tech stack
+## 9. Tech stack
 
 PostgreSQL · PySpark **4.1.1** · Delta Lake **4.3.0** · PostgreSQL JDBC **42.7.3**
 · dbt-core **1.11** · dbt-spark **1.10** (`type: spark, method: session`)

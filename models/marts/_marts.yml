@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "SCD2 customer dimension — one row per customer version."
+    columns:
+      - name: customer_key
+        description: "Surrogate key (dbt_scd_id), unique per version."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+
+  - name: dim_customers_current
+    description: "Current customer version only — one row per customer_id."
+    columns:
+      - name: customer_id
+        description: "Unique in the current view; the key used by fact_orders."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_key
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fact_orders
+    description: "Order-grain fact, conformed to the current customer dimension."
+    columns:
+      - name: order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Relates to the current customer dimension."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers_current')
+                field: customer_id

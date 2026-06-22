@@ -1,0 +1,21 @@
+version: 2
+
+snapshots:
+  - name: customers_snapshot
+    description: "SCD Type 2 history of the customer dimension."
+    columns:
+      - name: dbt_scd_id
+        description: "Surrogate key — unique per customer version."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Business/natural key — present on every version."
+        data_tests:
+          - not_null
+      - name: dbt_updated_at
+        data_tests:
+          - not_null
+      - name: dbt_valid_from
+        data_tests:
+          - not_null
